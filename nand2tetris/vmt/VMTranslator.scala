@@ -9,7 +9,7 @@ object VMTranslator {
 
   def main(args: Array[String]): Unit = args(0).split("\\.") match {
     case Array(file, "vm") =>
-      filename = file
+      filename = file.split("/").last
       writeFile(file + ".asm", translate(readFile(file + ".vm") map parse))
   }
 }
