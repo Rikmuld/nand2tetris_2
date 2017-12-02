@@ -9,6 +9,8 @@ object Stack {
   trait StackLine
   case class Memory(push: Boolean, segment: Segment, i: Int) extends StackLine
   case class Op(op: StackOps) extends StackLine
+  case class Label(label: String) extends StackLine
+  case class Jump(label: String, condition: Boolean) extends StackLine
   case object Fluff extends StackLine
 
   trait StackOps

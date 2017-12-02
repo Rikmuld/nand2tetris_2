@@ -17,7 +17,14 @@ object CodeWriter {
   def translate(line: StackLine, i: Int): Seq[String] = line match {
     case Op(op) => translateLogic(op, i)
     case Memory(action, segment, j) => translateSegment(action, segment, j)
+    case Label(lab) => label(lab)
+    case Jump(lab, condition) => translateJump(lab, condition)
     case Fluff => Nil
+  }
+
+  def translateJump(lab: String, condition: Boolean): Seq[String] = condition match {
+    case false => goto(lab) ++ jump
+    case true => pop ++ goto(lab) ++ jumpLT
   }
 
   def translateLogic(line: StackOps, i: Int): Seq[String] = line match {

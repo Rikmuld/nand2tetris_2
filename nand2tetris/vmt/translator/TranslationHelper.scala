@@ -37,6 +37,15 @@ object TranslationHelper {
   val setTrue =
     Seq("D=-1")
 
+  val jumpLT =
+    Seq("D;JLT")
+
+  val jumpGT =
+    Seq("D;JGT")
+
+  val jumpEQ =
+    Seq("D;JEQ")
+
   def label(label: String) =
     Seq(s"($label)")
 
