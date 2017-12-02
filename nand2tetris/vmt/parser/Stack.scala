@@ -11,6 +11,9 @@ object Stack {
   case class Op(op: StackOps) extends StackLine
   case class Label(label: String) extends StackLine
   case class Jump(label: String, condition: Boolean) extends StackLine
+  case class Function(name: String, nArgs: Int) extends StackLine
+  case class FunctionCall(name: String, nArgs: Int) extends StackLine
+  case object Return extends StackLine
   case object Fluff extends StackLine
 
   trait StackOps

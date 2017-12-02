@@ -10,7 +10,10 @@ object  Parser {
     case Array("label", label) => Label(label)
     case Array("goto", label) => Jump(label, condition = false)
     case Array("if-goto", label) => Jump(label, condition = true)
+    case Array("function", functionName, nArgs) => Function(functionName, nArgs.toInt)
+    case Array("call", functionName, nArgs) => FunctionCall(functionName, nArgs.toInt)
+    case Array("return") => Return
     case Array(op) => Op(op)
-    case a => Fluff
+    case _ => Fluff
   }
 }

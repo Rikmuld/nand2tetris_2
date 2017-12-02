@@ -9,6 +9,9 @@ import nand2tetris.vmt.translator.TranslationHelper._
 import nand2tetris.vmt.translator.CompPreamble._
 
 object CodeWriter {
+  val functionEnd: Seq[String] =
+    ???
+
   def translate(stack: Stack): Seq[String] =
     compPreamble(stack) ++ stack.zipWithIndex.flatMap {
       case (line, i) => translate(line, i)
@@ -19,8 +22,17 @@ object CodeWriter {
     case Memory(action, segment, j) => translateSegment(action, segment, j)
     case Label(lab) => label(lab)
     case Jump(lab, condition) => translateJump(lab, condition)
+    case Function(name, nArgs) => functionBegin(name, nArgs)
+    case FunctionCall(name, nArgs) => functionCall(name, nArgs)
+    case Return => functionEnd
     case Fluff => Nil
   }
+
+  def functionBegin(name: String, nArgs: Int): Seq[String] =
+    ???
+
+  def functionCall(name: String, nArgs: Int): Seq[String] =
+    ???
 
   def translateJump(lab: String, condition: Boolean): Seq[String] = condition match {
     case false => goto(lab) ++ jump
