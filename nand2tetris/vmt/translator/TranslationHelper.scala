@@ -27,11 +27,17 @@ object TranslationHelper {
   val at =
     Seq("A=M")
 
+  val atD =
+    Seq("A=D")
+
   val setAt =
     at ++ set
 
   val getAt =
     at ++ get
+
+  val getAtD =
+    atD ++ get
 
   val setZero =
     Seq("M=0")
@@ -87,8 +93,11 @@ object TranslationHelper {
   def getFrom(label: String) =
     goto(label) ++ get
 
-  def addition(n:Int) =
+  def add(n:Int) =
     setReg(0) ++ constant(n) ++ gotoReg(0) :+ "D=M+D"
+
+  def sub(n:Int) =
+    setReg(0) ++ constant(n) ++ gotoReg(0) :+ "D=M-D"
 
   object Stack {
     val pop =

@@ -12,12 +12,12 @@ object CodeWriter {
   val functionEnd: Seq[String] =
     pop ++ goto(ARGUMENT) ++ setAt ++
       goto(ARGUMENT) ++ get ++ goto(SP) ++ Seq("M=D+1") ++
-      goto(LOCAL) ++ get ++ addition(-5) ++ setReg(1) ++
-      goto(LOCAL) ++ Seq("D=M-1") ++ goto(THAT) ++ set ++
-      goto(LOCAL) ++ get ++ addition(-2) ++ goto(THIS) ++ set ++
-      goto(LOCAL) ++ get ++ addition(-3) ++ goto(ARGUMENT) ++ set ++
-      goto(LOCAL) ++ get ++ addition(-4) ++ goto(LOCAL) ++ set ++
-      getReg(1) ++ at ++ jump
+      goto(LOCAL) ++ get ++ sub(5) ++ getAtD ++ setReg(1) ++
+      goto(LOCAL) ++ Seq("A=M-1") ++ get ++ goto(THAT) ++ set ++
+      goto(LOCAL) ++ get ++ sub(2) ++ getAtD ++ goto(THIS) ++ set ++
+      goto(LOCAL) ++ get ++ sub(3) ++ getAtD ++ goto(ARGUMENT) ++ set ++
+      goto(LOCAL) ++ get ++ sub(4) ++ getAtD ++ goto(LOCAL) ++ set ++
+      atReg(1) ++ jump
 
   def translate(stack: Stack): Seq[String] =
     compPreamble(stack) ++ stack.zipWithIndex.flatMap {
@@ -44,7 +44,7 @@ object CodeWriter {
       goto(ARGUMENT) ++ get ++ push ++
       goto(THIS) ++ get ++ push ++
       goto(THAT) ++ get ++ push ++
-      goto(SP) ++ get ++ addition(-nArgs - 5) ++ goto(ARGUMENT) ++ set ++
+      goto(SP) ++ get ++ sub(nArgs + 5) ++ goto(ARGUMENT) ++ set ++
       goto(s"function.$name") ++ jump ++ label(s"function.$name.return.$i")
 
   def translateJump(lab: String, condition: Boolean): Seq[String] = condition match {
