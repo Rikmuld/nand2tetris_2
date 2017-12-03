@@ -1,5 +1,7 @@
 package nand2tetris.vmt.translator
 
+import TranslationHelper.Register._
+
 object TranslationHelper {
   final val SP = "SP"
   final val THAT = "THAT"
@@ -19,6 +21,9 @@ object TranslationHelper {
   val get =
     Seq("D=M")
 
+  val getAddress =
+    Seq("D=A")
+
   val at =
     Seq("A=M")
 
@@ -27,6 +32,12 @@ object TranslationHelper {
 
   val getAt =
     at ++ get
+
+  val setZero =
+    Seq("M=0")
+
+  val setZeroAt =
+    at ++ setZero
 
   val jump =
     Seq("0;JMP")
@@ -46,6 +57,9 @@ object TranslationHelper {
   val jumpEQ =
     Seq("D;JEQ")
 
+  val jumpNEQ =
+    Seq("D;JNE")
+
   def label(label: String) =
     Seq(s"($label)")
 
@@ -56,7 +70,7 @@ object TranslationHelper {
     Seq(s"@$a")
 
   def constant(i: Int) =
-    goto(i) :+ "D=A"
+    goto(i) ++ getAddress
 
   def comp(jmp: String, id: String) =
     (goto(s"COMP.$id") :+ "D=A") ++ goto(s"COMP.$jmp") ++ jump :+ s"(COMP.$id)"
@@ -73,12 +87,18 @@ object TranslationHelper {
   def getFrom(label: String) =
     goto(label) ++ get
 
+  def addition(n:Int) =
+    setReg(0) ++ constant(n) ++ gotoReg(0) :+ "D=M+D"
+
   object Stack {
     val pop =
       (goto(SP) :+ "M=M-1") ++ getAt
 
     val push =
       goto(SP) ++ setAt ++ goto(SP) :+ "M=M+1"
+
+    val pushZero =
+      goto(SP) ++ setZeroAt ++ goto(SP) :+ "M=M+1"
 
     def mutate(op: String) =
       ((goto(SP) :+ "M=M-1") ++ at :+ s"M=${op}M") ++ goto(SP) :+ "M=M+1"
@@ -108,8 +128,6 @@ object TranslationHelper {
   }
 
   object Segment {
-    import Register._
-
     def getOffset(segment: String, i: Int) =
       constant(i) ++ goto(segment) :+ "D=M+D"
 

@@ -10,7 +10,14 @@ import nand2tetris.vmt.translator.CompPreamble._
 
 object CodeWriter {
   val functionEnd: Seq[String] =
-    ???
+    pop ++ goto(ARGUMENT) ++ setAt ++
+      goto(ARGUMENT) ++ get ++ goto(SP) ++ Seq("M=D+1") ++
+      goto(LOCAL) ++ get ++ addition(-5) ++ setReg(1) ++
+      goto(LOCAL) ++ Seq("D=M-1") ++ goto(THAT) ++ set ++
+      goto(LOCAL) ++ get ++ addition(-2) ++ goto(THIS) ++ set ++
+      goto(LOCAL) ++ get ++ addition(-3) ++ goto(ARGUMENT) ++ set ++
+      goto(LOCAL) ++ get ++ addition(-4) ++ goto(LOCAL) ++ set ++
+      getReg(1) ++ at ++ jump
 
   def translate(stack: Stack): Seq[String] =
     compPreamble(stack) ++ stack.zipWithIndex.flatMap {
@@ -22,21 +29,27 @@ object CodeWriter {
     case Memory(action, segment, j) => translateSegment(action, segment, j)
     case Label(lab) => label(lab)
     case Jump(lab, condition) => translateJump(lab, condition)
-    case Function(name, nArgs) => functionBegin(name, nArgs)
-    case FunctionCall(name, nArgs) => functionCall(name, nArgs)
+    case Function(name, nArgs) => functionBegin(name, nArgs, i)
+    case FunctionCall(name, nArgs) => functionCall(name, nArgs, i)
     case Return => functionEnd
     case Fluff => Nil
   }
 
-  def functionBegin(name: String, nArgs: Int): Seq[String] =
-    ???
+  def functionBegin(name: String, nArgs: Int, i:Int): Seq[String] =
+    label(s"function.$name")++ goto(SP) ++ get ++ goto(LOCAL) ++ set ++ List.fill(nArgs)(pushZero).flatten
 
-  def functionCall(name: String, nArgs: Int): Seq[String] =
-    ???
+  def functionCall(name: String, nArgs: Int, i:Int): Seq[String] =
+    goto(s"function.$name.return.$i") ++ getAddress ++ push ++
+      goto(LOCAL) ++ get ++ push ++
+      goto(ARGUMENT) ++ get ++ push ++
+      goto(THIS) ++ get ++ push ++
+      goto(THAT) ++ get ++ push ++
+      goto(SP) ++ get ++ addition(-nArgs - 5) ++ goto(ARGUMENT) ++ set ++
+      goto(s"function.$name") ++ jump ++ label(s"function.$name.return.$i")
 
   def translateJump(lab: String, condition: Boolean): Seq[String] = condition match {
     case false => goto(lab) ++ jump
-    case true => pop ++ goto(lab) ++ jumpLT
+    case true => pop ++ goto(lab) ++ jumpNEQ
   }
 
   def translateLogic(line: StackOps, i: Int): Seq[String] = line match {
