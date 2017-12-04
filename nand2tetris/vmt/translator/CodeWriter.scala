@@ -36,7 +36,7 @@ object CodeWriter {
   }
 
   def mainJump(doJump:Boolean): Seq[String] =
-    if(doJump) goto("function.Sys.init") ++ jump
+    if(doJump) constant(256) ++ goto(SP) ++ set ++ functionCall("Sys.init", 0, 0)
     else Seq()
 
   def functionBegin(name: String, nArgs: Int, i:Int): Seq[String] =
