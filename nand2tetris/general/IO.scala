@@ -1,6 +1,6 @@
 package nand2tetris.general
 
-import java.io.FileWriter
+import java.io.{File, FileWriter}
 
 import scala.io.Source
 
@@ -13,6 +13,12 @@ object IO {
 
     inFile.close()
     lines
+  }
+
+  def getDirFiles(dir: String): Seq[String] = new File(dir) match {
+    case theDir if theDir.exists && theDir.isDirectory =>
+      theDir.listFiles.map(_.getAbsolutePath)
+    case _ => Seq()
   }
 
   def writeFile(location: String, lines: Lines): Unit = {

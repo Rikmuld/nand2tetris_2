@@ -38,13 +38,13 @@ object Stack {
   case class Absolute(f: Int => String) extends Segment
   case object Constant extends Segment
 
-  implicit def segmentFromString(str: String): Segment = str match {
+  def getSegment(str: String, fileName: String): Segment = str match {
     case "local" => Relative(LOCAL)
     case "argument" => Relative(ARGUMENT)
     case "this" => Relative(THIS)
     case "that" => Relative(THAT)
     case "constant" => Constant
-    case "static" => Absolute(filename + "." + _)
+    case "static" => Absolute(fileName + "." + _)
     case "temp" => Absolute(i => (TEMP_OFFSET + i).toString)
     case "pointer" => Absolute(i => if(i == 0) THIS else THAT)
   }

@@ -5,11 +5,15 @@ import nand2tetris.vmt.parser.Parser._
 import nand2tetris.vmt.translator.CodeWriter._
 
 object VMTranslator {
-  var filename: String = _
-
   def main(args: Array[String]): Unit = args(0).split("\\.") match {
     case Array(file, "vm") =>
-      filename = file.split("/").last
-      writeFile(file + ".asm", translate(readFile(file + ".vm") map parse))
+      writeFile(file + ".asm", translate(false, readFile(file + ".vm") map parse(file.split("/").last)))
+    case Array(dir) =>
+      val input = getDirFiles(dir).filter(_.endsWith(".vm"))
+      val fileNames = input.map(_.split("/").last)
+      val fileLines = input.map(readFile)
+      val output = translate(true, (fileNames zip fileLines).flatMap(x => x._2 map parse(x._1)))
+
+      writeFile(dir + "/" + dir.split("/").last + ".asm", output)
   }
 }

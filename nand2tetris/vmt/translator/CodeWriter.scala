@@ -10,17 +10,17 @@ import nand2tetris.vmt.translator.CompPreamble._
 
 object CodeWriter {
   val functionEnd: Seq[String] =
-    pop ++ goto(ARGUMENT) ++ setAt ++
+    goto(LOCAL) ++ get ++ sub(5) ++ getAtD ++ setReg(1) ++
+      pop ++ goto(ARGUMENT) ++ setAt ++
       goto(ARGUMENT) ++ get ++ goto(SP) ++ Seq("M=D+1") ++
-      goto(LOCAL) ++ get ++ sub(5) ++ getAtD ++ setReg(1) ++
       goto(LOCAL) ++ Seq("A=M-1") ++ get ++ goto(THAT) ++ set ++
       goto(LOCAL) ++ get ++ sub(2) ++ getAtD ++ goto(THIS) ++ set ++
       goto(LOCAL) ++ get ++ sub(3) ++ getAtD ++ goto(ARGUMENT) ++ set ++
       goto(LOCAL) ++ get ++ sub(4) ++ getAtD ++ goto(LOCAL) ++ set ++
       atReg(1) ++ jump
 
-  def translate(stack: Stack): Seq[String] =
-    compPreamble(stack) ++ stack.zipWithIndex.flatMap {
+  def translate(jumpMain: Boolean, stack: Stack): Seq[String] =
+    compPreamble(stack) ++ mainJump(jumpMain) ++ stack.zipWithIndex.flatMap {
       case (line, i) => translate(line, i)
     }
 
@@ -34,6 +34,10 @@ object CodeWriter {
     case Return => functionEnd
     case Fluff => Nil
   }
+
+  def mainJump(doJump:Boolean): Seq[String] =
+    if(doJump) goto("function.Sys.init") ++ jump
+    else Seq()
 
   def functionBegin(name: String, nArgs: Int, i:Int): Seq[String] =
     label(s"function.$name")++ goto(SP) ++ get ++ goto(LOCAL) ++ set ++ List.fill(nArgs)(pushZero).flatten
