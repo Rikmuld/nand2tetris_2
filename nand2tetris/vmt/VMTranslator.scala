@@ -9,9 +9,9 @@ object VMTranslator {
     case Array(file, "vm") =>
       writeFile(file + ".asm", translate(false, readFile(file + ".vm") map parse(file.split("/").last)))
     case Array(dir) =>
-      val input = getDirFiles(dir).filter(_.endsWith(".vm"))
-      val fileNames = input.map(_.split("\\\\").last.dropRight(3))
-      val fileLines = input.map(readFile)
+      val input = getDirFiles(dir).filter(_.getAbsolutePath.endsWith(".vm"))
+      val fileNames = input.map(_.getName.dropRight(3))
+      val fileLines = input.map(file => readFile(file.getAbsolutePath))
       val output = translate(true, (fileNames zip fileLines).flatMap(x => x._2 map parse(x._1)))
 
       writeFile(dir + "/" + dir.split("/").last + ".asm", output)

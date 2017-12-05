@@ -15,9 +15,9 @@ object IO {
     lines
   }
 
-  def getDirFiles(dir: String): Seq[String] = new File(dir) match {
+  def getDirFiles(dir: String): Seq[File] = new File(dir) match {
     case theDir if theDir.exists && theDir.isDirectory =>
-      theDir.listFiles.map(_.getAbsolutePath)
+      theDir.listFiles
     case _ => Seq()
   }
 
