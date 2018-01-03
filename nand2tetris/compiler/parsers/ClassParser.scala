@@ -22,14 +22,14 @@ object ClassParser {
     _ <- matchA(BRACE_C)
   } yield Class(className, variables, routines))
 
-  def parseClassVariable: Parser[ClassVariable] = rewind(for {
+  def parseClassVariable: Parser[ClassVarDec] = rewind(for {
     kind <- matchAny(STATIC, FIELD)
     typ <- matchVariableType
     variables <- parseAllSpaced(COMMA)(matchIdentifier)
     _ <- matchA(SEMICOLON)
-  } yield ClassVariable(kind, typ, variables))
+  } yield ClassVarDec(kind, typ, variables))
 
-  def parseClassRoutine: Parser[ClassRoutine] = rewind(for {
+  def parseClassRoutine: Parser[SubroutineDec] = rewind(for {
     kind <- matchAny(CONSTRUCTOR, FUNCTION, METHOD)
     typ <- matchResultType
     name <- matchIdentifier
@@ -39,7 +39,7 @@ object ClassParser {
     _ <- matchA(BRACE_O)
     body <- parseRoutineBody
     _ <- matchA(BRACE_C)
-  } yield ClassRoutine(kind, typ, name, parameters, body))
+  } yield SubroutineDec(kind, typ, name, parameters, body))
 
   def parseParameter: Parser[Parameter] = rewind(for {
     typ <- matchVariableType

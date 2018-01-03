@@ -10,5 +10,5 @@ object Parser {
     parseClass.run(a)._1
 
   def main(args: Array[String]): Unit =
-    println(GrammarTree.print(parse(Tokenizer.tokenize(IO.readFile(args(0)))).get)(0))
+    println(GrammarTree.print(parse(Tokenizer.tokenize(IO.readFile(args(0)))).get)(true, 0))
 }

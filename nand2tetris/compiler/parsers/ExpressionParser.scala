@@ -29,12 +29,15 @@ object ExpressionParser {
     tryAll[Term](
       parseUnitaryTerm,
       parseArrayTerm,
-      parseRoutineCall.asInstanceOf[Parser[Term]],
+      parseRoutineCallTerm.asInstanceOf[Parser[Term]],
       parseExpressionTerm.asInstanceOf[Parser[Term]],
       parseSimpleTerm)
 
   def parseExpressionTerm: Parser[ExpressionTerm] =
-     rewind(between(PARENTHESIS_O, PARENTHESIS_C)(parseExpression).map(a => ExpressionTerm(a)))
+    rewind(between(PARENTHESIS_O, PARENTHESIS_C)(parseExpression).map(a => ExpressionTerm(a)))
+
+  def parseRoutineCallTerm: Parser[SubroutineCallTerm] =
+    rewind(parseRoutineCall.map(c => SubroutineCallTerm(c)))
 
   def parseUnitaryTerm: Parser[Term] = rewind(for {
     op <- matchUniOp

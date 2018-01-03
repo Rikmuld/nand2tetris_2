@@ -6,9 +6,11 @@ trait Term extends GrammarTree
 
 case class Expression(term: Term, opTerm: Seq[(Symbol, Term)]) extends GrammarTree
 
+case class SubroutineCall(prefix: Option[Identifier], routineName: Identifier, callParameters: Seq[Expression]) extends GrammarTree
+
 case class ExpressionTerm(exp: Expression) extends Term
 
-case class SubroutineCall(prefix: Option[Identifier], routineName: Identifier, callParameters: Seq[Expression]) extends Term
+case class SubroutineCallTerm(call: SubroutineCall) extends Term
 
 case class SimpleTerm(lexical: LexicalElement) extends Term
 

@@ -2,11 +2,11 @@ package nand2tetris.compiler.grammar
 
 import LexicalElements._
 
-case class Class(name: Identifier, vars: Seq[ClassVariable], fs: Seq[ClassRoutine]) extends GrammarTree
+case class Class(name: Identifier, vars: Seq[ClassVarDec], fs: Seq[SubroutineDec]) extends GrammarTree
 
-case class ClassVariable(kind: Keyword, typ: LexicalElement, varNames: Seq[Identifier]) extends GrammarTree
+case class ClassVarDec(kind: Keyword, typ: LexicalElement, varNames: Seq[Identifier]) extends GrammarTree
 
-case class ClassRoutine(kind: Keyword, returnType: LexicalElement, name: Identifier, params: Seq[Parameter], body: SubroutineBody) extends GrammarTree
+case class SubroutineDec(kind: Keyword, returnType: LexicalElement, name: Identifier, params: Seq[Parameter], body: SubroutineBody) extends GrammarTree
 
 case class Parameter(typ: LexicalElement, varNames: Identifier) extends GrammarTree
 
