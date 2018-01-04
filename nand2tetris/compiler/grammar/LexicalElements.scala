@@ -4,7 +4,7 @@ object LexicalElements {
   trait LexicalElement {
     def print(level: Int = 0): String = (" " * level * 2) + (this match {
       case Keyword(str) => s"<keyword> $str </keyword>"
-      case Symbol(s) => s"<symbol> $s </symbol>"
+      case Symbol(s) => s"<symbol> ${escape(s)} </symbol>"
       case ConstantInteger(int) => s"<integerConstant> $int </integerConstant>"
       case ConstantString(str) => s"<stringConstant> $str </stringConstant>"
       case Identifier(i) => s"<identifier> $i </identifier>"
@@ -98,4 +98,11 @@ object LexicalElements {
 
   def isIdentifier(s: String) =
     s.matches("^[a-zA-Z_]\\w*$")
+
+  private def escape(s: Char): String = s match {
+    case '<' => "&lt;"
+    case '>' => "&gt;"
+    case '&' => "&amp;"
+    case _ => s.toString
+  }
 }

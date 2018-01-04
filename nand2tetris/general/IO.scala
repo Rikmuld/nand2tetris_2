@@ -26,7 +26,9 @@ object IO {
     val writer = new FileWriter(outFile)
 
     outFile.createNewFile()
-    lines.foreach(l => if (l.length > 0) writer.write(l + "\n"))
+
+    if(lines.length > 1) lines.dropRight(1).foreach(l => if (l.length > 0) writer.write(l + "\n"))
+    writer.write(lines.last)
 
     writer.flush()
     writer.close()
