@@ -22,9 +22,15 @@ object StatementTranslator {
       case ReturnStatement(opValue) =>
         optionalElse(constant(0), opValue)(expressionTr) ++ Seq("return")
       case LetStatement(varName, opArray, equals) =>
-        equals ++ pop(varName, cv, rv) //TODO opArray
+        if(opArray.isDefined)
+          opArray.get ++
+          push(varName, cv, rv) ++
+          Seq("add") ++
+          equals ++
+          Seq("pop temp 0", "pop pointer 1", "push temp 0", "pop that 0")
+        else equals ++ pop(varName, cv, rv)
       case WhileStatement(condition, whileTrue) =>
-        val theLabel = "l" + Random.alphanumeric.take(15)
+        val theLabel = "l" + Random.alphanumeric.take(15).mkString
 
         label(theLabel + "1") ++
         condition ++
@@ -34,7 +40,7 @@ object StatementTranslator {
         goto(theLabel + "1") ++
         label(theLabel + "2")
       case IfStatement(condition, ifTrue, opElse) =>
-        val theLabel = "l" + Random.alphanumeric.take(15)
+        val theLabel = "l" + Random.alphanumeric.take(15).mkString
 
         condition ++
         not ++

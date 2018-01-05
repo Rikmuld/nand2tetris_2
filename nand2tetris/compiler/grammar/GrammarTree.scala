@@ -16,14 +16,17 @@ trait GrammarTree {
 }
 
 object GrammarTree {
-  def print(element: GrammarTree)(printName: Boolean = true, level: Int = 0): String =
+  def printTree(element: GrammarTree): String =
+    print(element, true, 0)
+
+  private def print(element: GrammarTree, printName: Boolean, level: Int): String =
     encapsulate(element.xmlName, printName && element.forceName, level, element match {
       case Class(name, vars, routines) =>
         CLASS.print(level + 1) +
           name.print(level + 1) +
           BRACE_O.print(level + 1) +
-          vars.map(print(_)(true, level + 1)).foldLeft("")(_ + _) +
-          routines.map(print(_)(true, level + 1)).foldLeft("")(_ + _) +
+          vars.map(print(_, true, level + 1)).foldLeft("")(_ + _) +
+          routines.map(print(_, true, level + 1)).foldLeft("")(_ + _) +
           BRACE_C.print(level + 1)
       case ClassVarDec(kind, typ, varNames) =>
         kind.print(level + 1) +
@@ -37,14 +40,14 @@ object GrammarTree {
           PARENTHESIS_O.print(level + 1) +
           encapsulate("parameterList", true, level + 1, printSpacedList2(COMMA, params, false, level + 2)) +
           PARENTHESIS_C.print(level + 1) +
-          print(body)(true, level + 1)
+          print(body, true, level + 1)
       case Parameter(typ, name) =>
         typ.print(level + 1) +
           name.print(level + 1)
       case SubroutineBody(variables, statements) =>
         BRACE_O.print(level + 1) +
-          variables.map(print(_)(true, level + 1)).foldLeft("")(_ + _) +
-          encapsulate("statements", statements.nonEmpty, level + 1, statements.map(print(_)(true, level + 2)).foldLeft("")(_ + _)) +
+          variables.map(print(_, true, level + 1)).foldLeft("")(_ + _) +
+          encapsulate("statements", statements.nonEmpty, level + 1, statements.map(print(_, true, level + 2)).foldLeft("")(_ + _)) +
           BRACE_C.print(level + 1)
       case VarDec(typ, varNames) =>
         VAR.print(level + 1) +
@@ -56,51 +59,51 @@ object GrammarTree {
           varName.print(level + 1) +
           optionalArray.fold("")(a =>
             BRACKET_SQ_O.print(level + 1) +
-              print(a)(true, level + 1) +
+              print(a, true, level + 1) +
               BRACKET_SQ_C.print(level + 1)
           ) +
           EQUALS.print(level + 1) +
-          print(equals)(true, level + 1) +
+          print(equals, true, level + 1) +
           SEMICOLON.print(level + 1)
       case DoStatement(call) =>
         DO.print(level + 1) +
-          print(call)(true, level + 1) +
+          print(call, true, level + 1) +
           SEMICOLON.print(level + 1)
       case WhileStatement(condition, whileTrue) =>
         WHILE.print(level + 1) +
           PARENTHESIS_O.print(level + 1) +
-          print(condition)(true, level + 1) +
+          print(condition, true, level + 1) +
           PARENTHESIS_C.print(level + 1) +
           BRACE_O.print(level + 1) +
-          encapsulate("statements", whileTrue.nonEmpty, level + 1, whileTrue.map(print(_)(true, level + 2)).foldLeft("")(_ + _)) +
+          encapsulate("statements", whileTrue.nonEmpty, level + 1, whileTrue.map(print(_, true, level + 2)).foldLeft("")(_ + _)) +
           BRACE_C.print(level + 1)
       case IfStatement(condition, ifTrue, ifFalse) =>
         IF.print(level + 1) +
           PARENTHESIS_O.print(level + 1) +
-          print(condition)(true, level + 1) +
+          print(condition, true, level + 1) +
           PARENTHESIS_C.print(level + 1) +
           BRACE_O.print(level + 1) +
-        encapsulate("statements", ifTrue.nonEmpty, level + 1, ifTrue.map(print(_)(true, level + 2)).foldLeft("")(_ + _)) +
+        encapsulate("statements", ifTrue.nonEmpty, level + 1, ifTrue.map(print(_, true, level + 2)).foldLeft("")(_ + _)) +
           BRACE_C.print(level + 1) +
           ifFalse.fold("")(s =>
             ELSE.print(level + 1) +
               BRACE_O.print(level + 1) +
-              encapsulate("statements", s.nonEmpty, level + 1, s.map(print(_)(true, level + 2)).foldLeft("")(_ + _)) +
+              encapsulate("statements", s.nonEmpty, level + 1, s.map(print(_, true, level + 2)).foldLeft("")(_ + _)) +
               BRACE_C.print(level + 1)
           )
       case ReturnStatement(optionalReturn) =>
         RETURN.print(level + 1) +
-          optionalReturn.fold("")(print(_)(true, level + 1)) +
+          optionalReturn.fold("")(print(_, true, level + 1)) +
           SEMICOLON.print(level + 1)
       case Expression(term, opTerm) =>
-        print(term)(true, level + 1) +
-          opTerm.map(data => data._1.print(level + 1) + print(data._2)(true, level + 1)).foldLeft("")(_ + _)
+        print(term, true, level + 1) +
+          opTerm.map(data => data._1.print(level + 1) + print(data._2, true, level + 1)).foldLeft("")(_ + _)
       case ExpressionTerm(exp) =>
         PARENTHESIS_O.print(level + 1) +
-          print(exp)(true, level + 1) +
+          print(exp, true, level + 1) +
           PARENTHESIS_C.print(level + 1)
       case SubroutineCallTerm(routine) =>
-          print(routine)(true, level + 1)
+          print(routine, true, level + 1)
       case SubroutineCall(prefix, routineName, callParameters) =>
         prefix.fold("")(e =>
           e.print(level) +
@@ -115,11 +118,11 @@ object GrammarTree {
       case ArrayTerm(varName, arrayExp) =>
         varName.print(level + 1) +
           BRACKET_SQ_O.print(level + 1) +
-          print(arrayExp)(true, level + 1) +
+          print(arrayExp, true, level + 1) +
           BRACKET_SQ_C.print(level + 1)
       case UnitaryOpTerm(op, term) =>
         op.print(level + 1) +
-          print(term)(true, level + 1)
+          print(term, true, level + 1)
       case _ =>
         ""
     })
@@ -135,7 +138,7 @@ object GrammarTree {
 
   def printSpacedList2[A <: GrammarTree](splitter: LexicalElement, list: Seq[A], doPrint: Boolean, level: Int): String =
     if (list.isEmpty) ""
-    else print(list.head)(doPrint, level - (if (doPrint) 0 else 1)) + list.tail.map(print(_)(doPrint, level - (if (doPrint) 0 else 1))).foldLeft("")(_ + splitter.print(level) + _)
+    else print(list.head, doPrint, level - (if (doPrint) 0 else 1)) + list.tail.map(print(_, doPrint, level - (if (doPrint) 0 else 1))).foldLeft("")(_ + splitter.print(level) + _)
 
   def decapitalize(str: String): String =
     str.charAt(0).toLower.toString + str.substring(1)

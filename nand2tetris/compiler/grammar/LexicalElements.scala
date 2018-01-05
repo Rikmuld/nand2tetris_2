@@ -10,6 +10,14 @@ object LexicalElements {
       case Identifier(i) => s"<identifier> $i </identifier>"
       case _ => ""
     }) + "\n"
+
+    def stringValue: String = this match {
+      case Keyword(str) => str
+      case Symbol(char) => char.toString
+      case ConstantInteger(int) => int.toString
+      case ConstantString(str) => str
+      case Identifier(str) => str
+    }
   }
 
   case class Keyword(str: String) extends LexicalElement

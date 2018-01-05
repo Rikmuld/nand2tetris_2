@@ -15,10 +15,22 @@ object IO {
     lines
   }
 
-  def getDirFiles(dir: String): Seq[File] = new File(dir) match {
-    case theDir if theDir.exists && theDir.isDirectory =>
-      theDir.listFiles
-    case _ => Seq()
+  def readFiles(dir: String): Map[String, Lines] =
+    getDirFiles(dir).map(file => file.getAbsolutePath -> readFile(file.getAbsolutePath)).toMap
+
+  def readFiles(dir: String, typ: String): Map[String, Lines] =
+    readFilesFilter(dir)(_.endsWith("." + typ))
+
+  def readFilesFilter(dir: String)(f: String => Boolean): Map[String, Lines] =
+    getDirFiles(dir)
+      .filter(file => f(file.getAbsolutePath))
+      .map(file => file.getAbsolutePath -> readFile(file.getAbsolutePath)).toMap
+
+  def readAll(location: String, typ: String): Map[String, Lines] = location.split("\\.") match {
+    case Array(file, ext) if ext == typ =>
+      Map(location -> IO.readFile(location))
+    case Array(dir) =>
+      IO.readFiles(location, typ)
   }
 
   def writeFile(location: String, lines: Lines): Unit = {
@@ -32,5 +44,30 @@ object IO {
 
     writer.flush()
     writer.close()
+  }
+
+  def writeAll(data: Map[String, Lines]): Unit =
+    data.foreach {
+      case (location, lines) => writeFile(location, lines)
+    }
+
+  def readWriteComm[A, B](location: String, readTyp: String, writeTyp: String)
+                     (forward: Lines => A)
+                     (comm: Seq[A] => B)
+                     (backward: (A, B) => Lines): Unit = {
+    val data = readAll(location, readTyp) mapValues forward
+    val all = comm(data.values.toSeq)
+    writeAll(data.map {
+      case(name, single) => name.dropRight(readTyp.length) + writeTyp -> backward(single, all)
+    })
+  }
+
+  def readWrite[A, B](location: String, readTyp: String, writeTyp: String)(map: Lines => Lines): Unit =
+    writeAll(readAll(location, readTyp) mapValues map)
+
+  def getDirFiles(dir: String): Seq[File] = new File(dir) match {
+    case theDir if theDir.exists && theDir.isDirectory =>
+      theDir.listFiles
+    case _ => Seq()
   }
 }

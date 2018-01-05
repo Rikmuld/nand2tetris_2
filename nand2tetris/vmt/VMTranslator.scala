@@ -5,6 +5,7 @@ import nand2tetris.vmt.parser.Parser._
 import nand2tetris.vmt.translator.CodeWriter._
 
 object VMTranslator {
+  //cleanup with IO object (add combine to IO object)
   def main(args: Array[String]): Unit = args(0).split("\\.") match {
     case Array(file, "vm") =>
       writeFile(file + ".asm", translate(false, readFile(file + ".vm") map parse(file.split("/").last)))

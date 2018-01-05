@@ -1,16 +1,21 @@
 package nand2tetris.compiler
 
+import nand2tetris.compiler.Tokenizer.Tokens
 import nand2tetris.compiler.parsers.ClassParser._
 import nand2tetris.compiler.grammar._
 import nand2tetris.general.IO._
+import Tokenizer._
+import nand2tetris.compiler.grammar.GrammarTree._
 
 object JackAnalyzer {
-  def main(args: Array[String]): Unit = args(0).split("\\.") match {
-    case Array(file, "jack") =>
-      writeFile(file + ".xml", Seq(GrammarTree.print(parseClass.run(Tokenizer.tokenize(readFile(file + ".jack")))._1.get)(true, 0)))
-    case Array(dir) =>
-      getDirFiles(dir).filter(_.getAbsolutePath.endsWith(".jack")) foreach { file =>
-        writeFile(file.getAbsolutePath.dropRight(5) + ".xml", Seq(GrammarTree.print(parseClass.run(Tokenizer.tokenize(readFile(file.getAbsolutePath)))._1.get)(true, 0)))
-      }
-  }
+  def main(args: Array[String]): Unit =
+    readWrite(args(0), "jack", ".xml")(
+      tokenize _ andThen analyzeFile _ andThen printTree _ andThen toSeq _
+    )
+
+  def analyzeFile(tokens: Tokens): Class =
+    parseClass.run(tokens)._1.get
+
+  private def toSeq(str: String): Seq[String] =
+    Seq(str)
 }

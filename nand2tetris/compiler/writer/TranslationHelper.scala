@@ -35,8 +35,23 @@ object TranslationHelper {
   def push(name: Identifier, classTable: VarTable, routineTable: VarTable): Seq[String] =
     VariableAnalyzer.translate(name, true, classTable, routineTable)
 
-  def operator(op: Symbol): Seq[String] =
-    Seq(op.char.toString) //TODO replace * and / with os functions
+  def operator(op: Symbol): Seq[String] = op match {
+    case ASTERISK => Seq("call Math.multiply 2")
+    case SLASH => Seq("call Math.divide 2")
+    case PLUS => Seq("add")
+    case MINUS => Seq("sub")
+    case AND => Seq("and")
+    case OR => Seq("or")
+    case EQUALS => Seq("eq") // i.e. ==
+    case BRACKET_AG_O => Seq("lt")
+    case BRACKET_AG_C => Seq("gt")
+  }
+
+  def unitary(op: Symbol): Seq[String] = op match {
+    case NOT => Seq("not")
+    case MINUS => Seq("not")
+  }
+
 
   def constant(int: Int): Seq[String] =
     Seq(s"push constant $int")
